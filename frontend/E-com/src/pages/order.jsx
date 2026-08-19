@@ -58,11 +58,13 @@ const shippingInfo = {
 
     const paymentInfo ={status}
 
-
-
+     
         const placeOrder = () => {
-    dispatch(Postorder({taxPrice,shippingPrice,itemsPrice: cart?.totalPrice,shippingInfo,orderItems,paymentInfo}));
-    alert("Order Placed successfully")
+
+            if(!shippingInfo){alert("Enter all Shipping details")}
+           else{  dispatch(Postorder({taxPrice,shippingPrice,itemsPrice: cart?.totalPrice,shippingInfo,orderItems,paymentInfo}));
+             alert("Order Placed successfully")}
+  
     }
 
 
@@ -248,7 +250,12 @@ const shippingInfo = {
 
                             </div>
 
-                            <button type="submit">Submit</button>
+                                 <div className="d-flex justify-content-center">
+                                <button className="btn btn-sm btn-primary px-3" type="submit">
+                                    Submit
+                                </button>
+
+                            </div>
 
                         </form>)}
 
