@@ -169,7 +169,7 @@ const productSlice = createSlice({
         })
         .addCase(GetSingleProduct.rejected, (state, action) => {
             state.loading = false
-            state.error = action.payload.error
+            state.error = action.payload.error  || action.payload?.message || "Failed to fetch product";
         })
         builder
         .addCase(relatedProduct.pending, (state) => {   
