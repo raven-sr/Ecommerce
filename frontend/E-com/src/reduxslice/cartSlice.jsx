@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../app/api";
 
 export const CreateCart = createAsyncThunk("/add/cart", async(cartValue, { rejectWithValue }) => {
     try {
-        const {data} = await axios.post("/api/v1/add/cart", cartValue)
+        const {data} = await api.post("/api/v1/add/cart", cartValue)
         return data
     } catch (error) {
         return rejectwithValue(error?.response?.data)
@@ -13,7 +13,7 @@ export const CreateCart = createAsyncThunk("/add/cart", async(cartValue, { rejec
 
 export const GetCart = createAsyncThunk("/get/cart", async(_, { rejectWithValue }) => {
     try {
-        const {data} = await axios.get("/api/v1/get/cart")
+        const {data} = await api.get("/api/v1/get/cart")
         return data
     } catch (error) {
         return rejectwithValue(error?.response?.data)
@@ -22,7 +22,7 @@ export const GetCart = createAsyncThunk("/get/cart", async(_, { rejectWithValue 
 
 export const deleteCart = createAsyncThunk("/delete/cart", async(id, {rejectWithValue}) => {
     try {
-        const {data} = await axios.delete(`/api/v1/delete/cart/${id}`)
+        const {data} = await api.delete(`/api/v1/delete/cart/${id}`)
         
         return data
         
@@ -33,7 +33,7 @@ export const deleteCart = createAsyncThunk("/delete/cart", async(id, {rejectWith
 
 export const updateCart = createAsyncThunk("/update/cart", async({id,quantity}, {rejectWithValue}) => {
     try {
-        const {data} = await axios.put(`/api/v1/update/cart/${id}`,{quantity: quantity})
+        const {data} = await api.put(`/api/v1/update/cart/${id}`,{quantity: quantity})
         
         return data
         
@@ -44,7 +44,7 @@ export const updateCart = createAsyncThunk("/update/cart", async({id,quantity}, 
 
 export const priceCalculation = createAsyncThunk("/price/calculation", async(Subtotal, { rejectWithValue }) => {
     try {
-        const {data} = await axios.post("/api/v1/post/prices", {itemsPrice: Subtotal})
+        const {data} = await api.post("/api/v1/post/prices", {itemsPrice: Subtotal})
         return data
     } catch (error) {
         return rejectwithValue(error?.response?.data)

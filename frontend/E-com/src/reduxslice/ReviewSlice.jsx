@@ -1,9 +1,9 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit"
-import axios from "axios"
+import api from "../app/api"
 
 export const GetReview = createAsyncThunk("/get/review", async(id, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get(`/api/v1/product/reviews/${id}`)
+        const {data} = await api.get(`/api/v1/product/reviews/${id}`)
         return data
         
     } catch (error) {
@@ -15,7 +15,7 @@ export const Postreview = createAsyncThunk("/post/review", async({id,comment,rat
 
     try {
 
-        const {data} = await axios.post("/api/v1/product/review",{rating: rating,comment: comment,productId: id})
+        const {data} = await api.post("/api/v1/product/review",{rating: rating,comment: comment,productId: id})
         return data
         
     } catch (error) {

@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit"
-import axios from "axios"
+import api from "../app/api"
 
 
 
@@ -7,7 +7,7 @@ export const Postorder = createAsyncThunk("/post/order", async({itemsPrice,taxPr
 
     try {
 
-        const {data} = await axios.post("/api/v1/user/order",{itemsPrice: itemsPrice,taxPrice: taxPrice,shippingPrice: shippingPrice,shippingInfo: shippingInfo,orderItems: orderItems,paymentInfo: paymentInfo})
+        const {data} = await api.post("/api/v1/user/order",{itemsPrice: itemsPrice,taxPrice: taxPrice,shippingPrice: shippingPrice,shippingInfo: shippingInfo,orderItems: orderItems,paymentInfo: paymentInfo})
         return data
         
     } catch (error) {
@@ -19,7 +19,7 @@ export const getOrder = createAsyncThunk("/get/order", async(_, {rejectWithValue
 
     try {
 
-        const {data} = await axios.get("/api/v1/user/orders")
+        const {data} = await api.get("/api/v1/user/orders")
         return data
         
     } catch (error) {
@@ -31,7 +31,7 @@ export const getSingleOrder = createAsyncThunk("/get/single/order", async(id, {r
 
     try {
 
-        const {data} = await axios.get(`/api/v1/user/order/${id}`)
+        const {data} = await api.get(`/api/v1/user/order/${id}`)
         return data
         
     } catch (error) {
@@ -43,7 +43,7 @@ export const deleteOrder = createAsyncThunk("/delete/order", async(id, {rejectWi
 
     try {
 
-        const {data} = await axios.delete(`/api/v1/user/delete/${id}`)
+        const {data} = await api.delete(`/api/v1/user/delete/${id}`)
         return data
         
     } catch (error) {

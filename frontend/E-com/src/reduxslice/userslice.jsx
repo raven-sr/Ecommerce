@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit"
-import axios from "axios"
+import api from "../app/api"
 
 export const RegisterUser = createAsyncThunk("/register/user", async(user, {rejectWithValue}) => {
     try {
@@ -8,7 +8,7 @@ export const RegisterUser = createAsyncThunk("/register/user", async(user, {reje
                 "Content-Type": "multipart/form-data"
             }
         };
-        const {data} = await axios.post("/api/v1/register", user, config)
+        const {data} = await api.post("/api/v1/register", user, config)
         return data
         
     } catch (error) {
@@ -18,7 +18,7 @@ export const RegisterUser = createAsyncThunk("/register/user", async(user, {reje
 export const LoginUser = createAsyncThunk("/login/user", async(user, {rejectWithValue}) => {
     try {
     
-        const {data} = await axios.post("/api/v1/login", user)
+        const {data} = await api.post("/api/v1/login", user)
         return data
         
     } catch (error) {
@@ -28,7 +28,7 @@ export const LoginUser = createAsyncThunk("/login/user", async(user, {rejectWith
 
 export const forgotPass = createAsyncThunk("/forgotpass/user", async(email, {rejectWithValue}) => {
     try {
-        const {data} = await axios.post("/api/v1/password/forgot", {email : email})
+        const {data} = await api.post("/api/v1/password/forgot", {email : email})
         return data
         
     } catch (error) {
@@ -39,7 +39,7 @@ export const forgotPass = createAsyncThunk("/forgotpass/user", async(email, {rej
 
 export const resetPass = createAsyncThunk("/resetpass/user", async({token, value}, {rejectWithValue}) => {
     try {
-        const {data} = await axios.post(`/api/v1/password/reset/${token}`, value)
+        const {data} = await api.post(`/api/v1/password/reset/${token}`, value)
         return data
     } catch (error) {
         return  rejectWithValue(error.response?.data)
@@ -48,7 +48,7 @@ export const resetPass = createAsyncThunk("/resetpass/user", async({token, value
 
 export const Logout = createAsyncThunk("/logout/user", async(_, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get("/api/v1/logout")
+        const {data} = await api.get("/api/v1/logout")
         return data
     } catch (error) {
         return  rejectWithValue(error.response?.data)
@@ -58,7 +58,7 @@ export const Logout = createAsyncThunk("/logout/user", async(_, {rejectWithValue
 export const CreateAddress = createAsyncThunk("/post/address/user", async({address,state,pinCode,phoneNo,city,country}, {rejectWithValue}) => {
     try {
     
-        const {data} = await axios.patch("/api/v1/create/address", {address: address,state: state,pinCode: pinCode,phoneNo: phoneNo,city: city,country: country})
+        const {data} = await api.patch("/api/v1/create/address", {address: address,state: state,pinCode: pinCode,phoneNo: phoneNo,city: city,country: country})
         return data
         
     } catch (error) {
@@ -68,7 +68,7 @@ export const CreateAddress = createAsyncThunk("/post/address/user", async({addre
 
 export const MyData = createAsyncThunk("/get/user", async(_, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get("/api/v1/get/mydata")
+        const {data} = await api.get("/api/v1/get/mydata")
         return data
     } catch (error) {
         return  rejectWithValue(error.response?.data)

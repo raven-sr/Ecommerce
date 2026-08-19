@@ -1,9 +1,9 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit"
-import axios from "axios"
+import api from "../app/api"
 
 export const GetProduct = createAsyncThunk("/get/product", async(_, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get("/api/v1/products")
+        const {data} = await api.get("/api/v1/products")
         return data
         
     } catch (error) {
@@ -13,7 +13,7 @@ export const GetProduct = createAsyncThunk("/get/product", async(_, {rejectWithV
 
 export const relatedProduct = createAsyncThunk("/get/related/product", async(keyword, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get(`/api/v1/products?keyword=${keyword}`)
+        const {data} = await api.get(`/api/v1/products?keyword=${keyword}`)
         return data
         
     } catch (error) {
@@ -23,7 +23,7 @@ export const relatedProduct = createAsyncThunk("/get/related/product", async(key
 
 export const page = createAsyncThunk("/get/page/product", async(Page, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get(`/api/v1/products?page=${Page}`)
+        const {data} = await api.get(`/api/v1/products?page=${Page}`)
         return data
         
     } catch (error) {
@@ -34,7 +34,7 @@ export const page = createAsyncThunk("/get/page/product", async(Page, {rejectWit
 
 export const GetSingleProduct = createAsyncThunk("/get/singleproduct", async(id, {rejectWithValue}) => {
     try {
-        const {data} = await axios.get(`/api/v1/product/${id}`)
+        const {data} = await api.get(`/api/v1/product/${id}`)
         
         return data
         
@@ -45,7 +45,7 @@ export const GetSingleProduct = createAsyncThunk("/get/singleproduct", async(id,
 
 export const deleteProduct = createAsyncThunk("/delete/singleproduct", async(id, {rejectWithValue}) => {
     try {
-        const {data} = await axios.delete(`/api/v1/admin/deleteproduct/${id}`)
+        const {data} = await api.delete(`/api/v1/admin/deleteproduct/${id}`)
         
         return data
         
@@ -66,7 +66,7 @@ export const UpdateProduct = createAsyncThunk(
                 }
             };
 
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/v1/admin/updateproduct/${id}`,
                 formData,
                 config
@@ -97,7 +97,7 @@ export const AddProduct = createAsyncThunk(
                 }
             };
 
-            const { data } = await axios.post(
+            const { data } = await api.post(
                 "/api/v1/admin/addproduct",
                 formData,
                 config
