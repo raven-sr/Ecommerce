@@ -15,7 +15,7 @@ const app = express();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://ecommerce-a2ne0mtjx-sms-11c2.vercel.app"
+        "https://ecommerce-dun-sigma-79.vercel.app"
     ],
     credentials: true
 }));
