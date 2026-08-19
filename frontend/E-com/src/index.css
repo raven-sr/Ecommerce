@@ -1,0 +1,1004 @@
+.rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rating-star {
+    cursor: pointer;
+    stroke: #333;
+    stroke-width: 1.2px;
+    /* Smooth filling */
+    fill: transparent;
+
+    transition:
+        fill 0.15s ease,
+        stroke 0.15s ease,
+        transform 0.15s ease;
+}
+
+.rating-star:hover {
+    transform: scale(1.12);
+}
+
+.rating-star.active {
+    fill: gold;
+    stroke: gold;
+}
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-height: 100%;
+}
+
+
+/* =====================================================
+   MAIN LOGIN PAGE
+===================================================== */
+
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+
+    position: relative;
+
+    display: flex;
+
+    background: #ffffff;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   LEFT SIDE
+===================================================== */
+
+.login-left {
+    width: 60%;
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+
+    position: relative;
+
+    z-index: 5;
+}
+
+
+/* =====================================================
+   LOGIN CARD
+===================================================== */
+
+.login-card {
+    width: 365px;
+
+    padding: 40px 38px 42px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.10);
+
+    position: relative;
+
+    z-index: 10;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.logo {
+    margin-bottom: 35px;
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+    color: #ed8068;
+}
+
+
+/* =====================================================
+   WELCOME TEXT
+===================================================== */
+
+.welcome-text {
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
+    color: #999999;
+}
+
+
+/* =====================================================
+   SIGN IN TITLE
+===================================================== */
+
+.login-title {
+    margin-bottom: 28px;
+
+    font-size: 36px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    color: #111111;
+}
+
+
+/* =====================================================
+   FORM GROUP
+===================================================== */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+
+/* =====================================================
+   LABEL
+===================================================== */
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    color: #333333;
+}
+
+
+/* =====================================================
+   PASSWORD LABEL
+===================================================== */
+
+.password-label {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+.password-label label {
+    margin-bottom: 7px;
+}
+
+
+/* =====================================================
+   FORGOT PASSWORD
+===================================================== */
+
+.forgot-link {
+    margin-bottom: 7px;
+
+    font-size: 11px;
+
+    color: #ed8068;
+
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    color: #df6d55;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.login-input {
+    width: 100%;
+
+    height: 46px;
+
+    padding: 0 13px;
+
+    border: 1px solid #eeeeee;
+
+    border-radius: 5px;
+
+    background: #fff4f0;
+
+    outline: none;
+
+    font-size: 13px;
+
+    color: #333333;
+}
+
+
+/* Placeholder */
+
+.login-input::placeholder {
+    color: #999999;
+}
+
+
+/* Input focus */
+
+.login-input:focus {
+    border-color: #ed8068;
+
+    background: #ffffff;
+
+    outline: none;
+}
+
+
+/* =====================================================
+   SIGN IN BUTTON
+===================================================== */
+
+.login-btn {
+    width: 100px;
+
+    height: 42px;
+
+    margin-top: 4px;
+
+    border: none;
+
+    border-radius: 22px;
+
+    background: #ed8068;
+
+    color: #ffffff;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+}
+
+
+/* Button hover */
+
+.login-btn:hover {
+    background: #df6d55;
+
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   REGISTER TEXT
+===================================================== */
+
+.register-text {
+    margin-top: 25px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    color: #999999;
+}
+
+
+/* Sign up */
+
+.signup-link {
+    margin-left: 5px;
+
+    color: #ed8068;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.signup-link:hover {
+    color: #df6d55;
+}
+
+
+/* =====================================================
+   RIGHT SIDE
+===================================================== */
+
+.login-right {
+    position: absolute;
+
+    top: 12px;
+
+    right: 12px;
+
+    width: 40%;
+
+    height: calc(100vh - 24px);
+
+    background: #ffede2;
+
+    border-radius: 0 18px 18px 0;
+
+    overflow: hidden;
+
+    z-index: 1;
+}
+
+
+/* =====================================================
+   IMAGE CONTAINER
+===================================================== */
+
+.image-container {
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   IMAGE
+===================================================== */
+
+.login-image {
+    width: 100%;
+
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    object-position: center;
+}
+
+
+/* =====================================================
+   LARGE DESKTOP
+===================================================== */
+
+@media (min-width: 1200px) {
+
+    .login-card {
+        transform: translateX(-40px);
+    }
+
+}
+
+
+/* =====================================================
+   LAPTOP
+===================================================== */
+
+@media (min-width: 992px) and (max-width: 1199px) {
+
+    .login-card {
+        transform: translateX(-20px);
+    }
+
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 991px) {
+
+    .login-page {
+        min-height: 100vh;
+
+        display: block;
+
+        overflow-y: auto;
+    }
+
+
+    .login-left {
+        width: 100%;
+
+        min-height: 100vh;
+
+        padding: 30px 20px;
+    }
+
+
+    .login-card {
+        width: 100%;
+
+        max-width: 400px;
+
+        transform: none;
+    }
+
+
+    .login-right {
+        display: none;
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 576px) {
+
+    .login-left {
+        padding: 20px 15px;
+    }
+
+
+    .login-card {
+        width: 100%;
+
+        padding: 30px 25px 35px;
+
+        border-radius: 12px;
+    }
+
+
+    .logo {
+        font-size: 22px;
+
+        margin-bottom: 28px;
+    }
+
+
+    .login-title {
+        font-size: 32px;
+
+        margin-bottom: 25px;
+    }
+
+
+    .login-input {
+        height: 48px;
+    }
+
+
+    .login-btn {
+        width: 100%;
+    }
+
+}
+/* =====================================================
+   PAGE
+===================================================== */
+
+.forgot-page {
+    width: 100%;
+    min-height: 100vh;
+
+    background: #f1f4fa;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =====================================================
+   PURPLE GLOW
+===================================================== */
+
+.forgot-glow {
+    position: absolute;
+
+    width: 230px;
+    height: 230px;
+
+    background: #8064ff;
+
+    border-radius: 50%;
+
+    filter: blur(70px);
+
+    opacity: 0.30;
+
+    top: 20px;
+    left: 50%;
+
+    transform: translateX(120px);
+
+    z-index: 0;
+}
+
+
+/* =====================================================
+   MAIN CARD
+===================================================== */
+
+.forgot-card {
+
+    width: 850px;
+    height: 440px;
+
+    background: #ffffff;
+
+    position: relative;
+
+    z-index: 2;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 15px 40px rgba(60, 70, 100, 0.08);
+}
+
+
+/* =====================================================
+   LEFT SIDE
+===================================================== */
+
+.forgot-left {
+
+    padding-left: 55px;
+    padding-right: 30px;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TITLE
+===================================================== */
+
+.forgot-title {
+
+    margin: 0 0 12px;
+
+    color: #111827;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
+.forgot-description {
+
+    margin: 0 0 30px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.forgot-left form {
+
+    width: 335px;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.forgot-input {
+
+    width: 335px;
+    height: 39px;
+
+    position: relative;
+
+    margin-bottom: 12px;
+}
+
+
+.forgot-input i {
+
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #8492a6;
+
+    font-size: 14px;
+
+    z-index: 2;
+
+    pointer-events: none;
+}
+
+
+.forgot-input input {
+
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+
+    padding: 0 12px 0 35px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 0;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-size: 11px;
+}
+
+
+.forgot-input input::placeholder {
+    color: #7b8798;
+}
+
+
+.forgot-input input:focus {
+
+    border-color: #4b55df;
+
+    box-shadow: none;
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.forgot-button {
+
+    width: 335px;
+    height: 39px;
+
+    border: none;
+
+    border-radius: 0;
+
+    background: #4b55df;
+
+    color: #ffffff;
+
+    font-size: 11px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    padding: 0;
+
+    transition: background 0.2s ease;
+}
+
+
+.forgot-button:hover {
+    background: #3d47d0;
+}
+
+
+/* =====================================================
+   BACK TO LOGIN
+===================================================== */
+
+.back-login {
+
+    width: 335px;
+
+    display: block;
+
+    text-align: center;
+
+    margin-top: 12px;
+
+    color: #718096;
+
+    font-size: 10px;
+
+    text-decoration: none;
+}
+
+
+.back-login:hover {
+    color: #4b55df;
+}
+
+
+/* =====================================================
+   RIGHT IMAGE COLUMN
+===================================================== */
+
+.forgot-image-col {
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    padding: 0;
+}
+
+
+/* =====================================================
+   IMAGE
+===================================================== */
+
+.forgot-image {
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    background: #ffffff;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .forgot-card {
+
+        width: 760px;
+
+        height: 410px;
+    }
+
+
+    .forgot-left {
+
+        padding-left: 40px;
+
+        padding-right: 20px;
+    }
+
+
+    .forgot-title {
+
+        font-size: 27px;
+    }
+
+
+    .forgot-left form,
+    .forgot-input,
+    .forgot-button,
+    .back-login {
+
+        width: 300px;
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 767.98px) {
+
+    .forgot-page {
+
+        min-height: 100vh;
+
+        padding: 25px 15px;
+
+        align-items: center;
+    }
+
+
+    .forgot-card {
+
+        width: 100%;
+
+        max-width: 430px;
+
+        height: auto;
+
+        overflow: hidden;
+    }
+
+
+    /*
+       Bootstrap:
+       col-md-6 becomes full width
+       below 768px automatically.
+    */
+
+    .forgot-left {
+
+        width: 100%;
+
+        padding: 45px 30px 35px;
+
+        box-sizing: border-box;
+    }
+
+
+    .forgot-title {
+
+        font-size: 25px;
+
+        margin-bottom: 10px;
+    }
+
+
+    .forgot-description {
+
+        font-size: 12px;
+
+        margin-bottom: 22px;
+    }
+
+
+    .forgot-left form,
+    .forgot-input,
+    .forgot-button,
+    .back-login {
+
+        width: 100%;
+    }
+
+
+    .forgot-input {
+
+        height: 40px;
+    }
+
+
+    .forgot-button {
+
+        height: 40px;
+
+        font-size: 11px;
+    }
+
+
+    /* =========================
+       IMAGE ON MOBILE
+    ========================= */
+
+    .forgot-image-col {
+
+        width: 100%;
+
+        height: 260px;
+
+        padding: 10px 20px 20px;
+
+        box-sizing: border-box;
+    }
+
+
+    .forgot-image {
+
+        width: 100%;
+
+        height: 100%;
+
+        object-fit: contain;
+    }
+
+
+    /* Glow */
+
+    .forgot-glow {
+
+        width: 180px;
+
+        height: 180px;
+
+        top: 40px;
+
+        left: 65%;
+
+        transform: translateX(-50%);
+
+        opacity: 0.25;
+    }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 400px) {
+
+    .forgot-page {
+
+        padding: 15px;
+    }
+
+
+    .forgot-left {
+
+        padding: 35px 22px 30px;
+    }
+
+
+    .forgot-title {
+
+        font-size: 23px;
+    }
+
+
+    .forgot-description {
+
+        font-size: 11px;
+    }
+
+
+    .forgot-image-col {
+
+        height: 230px;
+
+        padding: 5px 15px 15px;
+    }
+
+}
