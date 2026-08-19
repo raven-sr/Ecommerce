@@ -3,7 +3,7 @@ import env from "dotenv"
 import { connect_DB } from "./config/db.js"
 
 
-env.config({path:"backend/config/config.env"})
+env.config({path:"./config/config.env"})
 const port=process.env.port || 3000
 
 connect_DB()
