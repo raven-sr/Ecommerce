@@ -6,7 +6,7 @@ export const CreateCart = createAsyncThunk("/add/cart", async(cartValue, { rejec
         const {data} = await api.post("/api/v1/add/cart", cartValue)
         return data
     } catch (error) {
-        return rejectwithValue(error?.response?.data)
+        return rejectWithValue(error?.response?.data)
     }
 })
 
@@ -16,7 +16,7 @@ export const GetCart = createAsyncThunk("/get/cart", async(_, { rejectWithValue 
         const {data} = await api.get("/api/v1/get/cart")
         return data
     } catch (error) {
-        return rejectwithValue(error?.response?.data)
+        return rejectWithValue(error?.response?.data)
     }
 })
 
@@ -47,7 +47,7 @@ export const priceCalculation = createAsyncThunk("/price/calculation", async(Sub
         const {data} = await api.post("/api/v1/post/prices", {itemsPrice: Subtotal})
         return data
     } catch (error) {
-        return rejectwithValue(error?.response?.data)
+        return rejectWithValue(error?.response?.data)
     }
 })
 
