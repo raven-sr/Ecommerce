@@ -458,10 +458,13 @@ import { useEffect, useState } from "react";
 import Title from "../components/title";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { RegisterUser, removeSuccess, removeError } from "../reduxslice/userslice";
+import {
+    RegisterUser,
+    removeSuccess,
+    removeError
+} from "../reduxslice/userslice";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
-import "./Register.css";
 
 function Register() {
 
@@ -493,10 +496,10 @@ function Register() {
 
         if (file) {
 
-            // Preview image
+            // Preview
             setImage(URL.createObjectURL(file));
 
-            // Actual file for backend
+            // Actual file
             setImageFile(file);
         }
     };
@@ -532,11 +535,11 @@ function Register() {
 
         if (success) {
 
-            navigate("/login");
-
             toast.success("Registration successful!");
 
             dispatch(removeSuccess());
+
+            navigate("/login");
         }
 
     }, [success, dispatch, navigate]);
@@ -571,221 +574,307 @@ function Register() {
         <>
             <Title title="E-commerce | Register" />
 
-            <div className="register-page">
+            {/* =========================================
+                MAIN PAGE
+            ========================================= */}
 
-                {/* =========================
-                    BACKGROUND IMAGE
-                ========================= */}
+            <div
+                className="container-fluid min-vh-100 p-0"
+                style={{
+                    backgroundImage:
+                        "url('https://zdblogs.zohowebstatic.com/sites/academy/files/ecommerce_2.jpg')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundAttachment: "fixed"
+                }}
+            >
 
-                <div className="register-background">
+                <div className="container-fluid min-vh-100">
 
-                    <img
-                        src="https://zdblogs.zohowebstatic.com/sites/academy/files/ecommerce_2.jpg"
-                        alt="E-commerce"
-                    />
-
-                </div>
-
-
-                {/* =========================
-                    FORM PANEL
-                ========================= */}
-
-                <div className="register-form-panel">
-
-                    <div className="register-form-content">
+                    <div className="row min-vh-100 g-0">
 
 
-                        {/* =========================
-                            HEADER
-                        ========================= */}
+                        {/* =========================================
+                            LEFT SIDE IMAGE
+                            HIDDEN ON MOBILE
+                        ========================================= */}
 
-                        <div className="mb-4">
+                        <div className="col-lg-6 d-none d-lg-block">
 
-                            <h2 className="fw-bold mb-2">
-                                Create an account
-                            </h2>
-
-                            <p className="text-muted mb-0">
-                                Join Ramsan and start shopping today.
-                            </p>
+                            <div
+                                className="w-100 h-100"
+                                style={{
+                                    backgroundImage:
+                                        "url('https://zdblogs.zohowebstatic.com/sites/academy/files/ecommerce_2.jpg')",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center"
+                                }}
+                            />
 
                         </div>
 
 
-                        {/* =========================
-                            LOGIN LINK
-                        ========================= */}
+                        {/* =========================================
+                            RIGHT SIDE FORM
+                        ========================================= */}
 
-                        <div className="mb-4">
+                        <div
+                            className="col-12 col-lg-6 d-flex align-items-center justify-content-center py-4"
+                            style={{
+                                backgroundColor:
+                                    "rgba(253, 251, 251, 0)",
 
-                            <span className="text-muted">
-                                Already have an account?
-                            </span>
-
-                            <Link
-                                to="/login"
-                                className="text-decoration-none fw-semibold ms-1"
-                            >
-                                Sign in
-                            </Link>
-
-                        </div>
-
-
-                        {/* =========================
-                            FORM
-                        ========================= */}
-
-                        <form
-                            className="text-black"
-                            onSubmit={handleSubmit}
+                                WebkitBackdropFilter:
+                                    "blur(6px)"
+                            }}
                         >
 
+                            {/* =========================================
+                                FORM CONTAINER
+                            ========================================= */}
 
-                            {/* =========================
-                                USERNAME
-                            ========================= */}
-
-                            <div className="mb-3">
-
-                                <label
-                                    htmlFor="name"
-                                    className="form-label fw-semibold"
-                                >
-                                    User Name
-                                </label>
-
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="name"
-                                    name="name"
-                                    placeholder="Enter your username"
-                                    value={name}
-                                    onChange={(e) =>
-                                        setUsername(e.target.value)
-                                    }
-                                    required
-                                />
-
-                            </div>
+                            <div
+                                className="w-100 px-5"
+                                style={{
+                                    maxWidth: "520px"
+                                }}
+                            >
 
 
-                            {/* =========================
-                                EMAIL
-                            ========================= */}
+                                {/* =========================================
+                                    HEADER
+                                ========================================= */}
 
-                            <div className="mb-3">
+                                <div className="mb-4">
 
-                                <label
-                                    htmlFor="email"
-                                    className="form-label fw-semibold"
-                                >
-                                    Email
-                                </label>
+                                    <h2 className="fw-bold mb-2">
+                                        Create an account
+                                    </h2>
 
-                                <input
-                                    type="email"
-                                    className="form-control"
-                                    id="email"
-                                    name="email"
-                                    placeholder="Enter your email"
-                                    value={email}
-                                    onChange={(e) =>
-                                        setEmail(e.target.value)
-                                    }
-                                    required
-                                />
-
-                            </div>
-
-
-                            {/* =========================
-                                PASSWORD
-                            ========================= */}
-
-                            <div className="mb-3">
-
-                                <label
-                                    htmlFor="password"
-                                    className="form-label fw-semibold"
-                                >
-                                    Password
-                                </label>
-
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    id="password"
-                                    name="password"
-                                    placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    required
-                                />
-
-                            </div>
-
-
-                            {/* =========================
-                                PROFILE IMAGE
-                            ========================= */}
-
-                            <div className="mb-4">
-
-                                <label
-                                    htmlFor="image"
-                                    className="form-label fw-semibold"
-                                >
-                                    Profile Image
-                                </label>
-
-                                <div className="profile-upload">
-
-                                    <img
-                                        src={image}
-                                        alt="Profile preview"
-                                    />
-
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        id="image"
-                                        name="image"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                    />
+                                    <p className="text-dark mb-0">
+                                        Join Ramsan and start shopping today.
+                                    </p>
 
                                 </div>
 
+
+                                {/* =========================================
+                                    LOGIN LINK
+                                ========================================= */}
+
+                                <div className="mb-4">
+
+                                    <span className="text-dark">
+                                        Already have an account?
+                                    </span>
+
+                                    <Link
+                                        to="/login"
+                                        className="text-decoration-none fw-semibold ms-1"
+                                    >
+                                        Sign in
+                                    </Link>
+
+                                </div>
+
+
+                                {/* =========================================
+                                    FORM
+                                ========================================= */}
+
+                                <form
+                                    onSubmit={handleSubmit}
+                                    className="text-white"
+                                >
+
+
+                                    {/* =====================================
+                                        USERNAME
+                                    ===================================== */}
+
+                                    <div className="mb-3">
+
+                                        <label
+                                            htmlFor="name"
+                                            className="form-label fw-semibold"
+                                        >
+                                            User Name
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="name"
+                                            name="name"
+                                            placeholder="Enter your username"
+                                            value={name}
+                                            onChange={(e) =>
+                                                setUsername(
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
+
+                                    </div>
+
+
+                                    {/* =====================================
+                                        EMAIL + PASSWORD
+                                    ===================================== */}
+
+                                    <div className="row">
+
+
+                                        {/* EMAIL */}
+
+                                        <div className="col-12 col-md-6 mb-3">
+
+                                            <label
+                                                htmlFor="email"
+                                                className="form-label fw-semibold"
+                                            >
+                                                Email
+                                            </label>
+
+                                            <input
+                                                type="email"
+                                                className="form-control"
+                                                id="email"
+                                                name="email"
+                                                placeholder="Enter your email"
+                                                value={email}
+                                                onChange={(e) =>
+                                                    setEmail(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                required
+                                            />
+
+                                        </div>
+
+
+                                        {/* PASSWORD */}
+
+                                        <div className="col-12 col-md-6 mb-3">
+
+                                            <label
+                                                htmlFor="password"
+                                                className="form-label fw-semibold"
+                                            >
+                                                Password
+                                            </label>
+
+                                            <input
+                                                type="password"
+                                                className="form-control"
+                                                id="password"
+                                                name="password"
+                                                placeholder="Enter your password"
+                                                value={password}
+                                                onChange={(e) =>
+                                                    setPassword(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                required
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {/* =========================================
+                                        PROFILE IMAGE
+                                    ========================================= */}
+
+                                    <div className="mb-4">
+
+                                        <label
+                                            htmlFor="image"
+                                            className="form-label fw-semibold"
+                                        >
+                                            Profile Image
+                                        </label>
+
+
+                                        <div
+                                            className="
+                                                d-flex
+                                                flex-column
+                                                flex-sm-row
+                                                align-items-center
+                                                gap-3
+                                            "
+                                        >
+
+                                            {/* IMAGE PREVIEW */}
+
+                                            <img
+                                                src={image}
+                                                alt="Profile preview"
+                                                className="
+                                                    rounded-circle
+                                                    border
+                                                    flex-shrink-0
+                                                "
+                                                style={{
+                                                    width: "65px",
+                                                    height: "65px",
+                                                    objectFit: "cover"
+                                                }}
+                                            />
+
+
+                                            {/* FILE INPUT */}
+
+                                            <input
+                                                type="file"
+                                                className="form-control"
+                                                id="image"
+                                                name="image"
+                                                accept="image/*"
+                                                onChange={
+                                                    handleImageChange
+                                                }
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {/* =========================================
+                                        REGISTER BUTTON
+                                    ========================================= */}
+
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary w-100"
+                                    >
+                                        Create Account
+                                    </button>
+
+
+                                    {/* =========================================
+                                        TERMS
+                                    ========================================= */}
+
+                                    <p className="text-white text-center small mt-3 mb-0">
+
+                                        By creating an account, you agree
+                                        to our terms and conditions.
+
+                                    </p>
+
+
+                                </form>
+
                             </div>
 
-
-                            {/* =========================
-                                REGISTER BUTTON
-                            ========================= */}
-
-                            <button
-                                type="submit"
-                                className="btn btn-primary btn-lg w-100"
-                            >
-                                Create Account
-                            </button>
-
-
-                            {/* =========================
-                                TERMS
-                            ========================= */}
-
-                            <p className="text-muted text-center small mt-3 mb-0">
-                                By creating an account, you agree to our
-                                terms and conditions.
-                            </p>
-
-                        </form>
+                        </div>
 
                     </div>
 
