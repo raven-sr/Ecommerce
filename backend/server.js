@@ -24,7 +24,7 @@ process.on("uncaughtException",(err)=>{
 
 
 
-const server = app.listen(port,()=>{
+const server = app.listen(port, "0.0.0.0",()=>{
     console.log(`server is running in http:localhost:${port}`)
 })
 
