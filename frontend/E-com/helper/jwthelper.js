@@ -7,7 +7,7 @@ const sendToken=(user,statuscode,res)=>{
          sameSite: "none"
      }
   return res.status(statuscode).cookie("token",token,props).json({
-        sucess:true,
+        success:true,
         user,
         token,
     });
