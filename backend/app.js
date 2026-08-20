@@ -17,7 +17,9 @@ app.use(cors({
         "http://localhost:5173",
         "https://ecommerce-dun-sigma-79.vercel.app"
     ],
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());
