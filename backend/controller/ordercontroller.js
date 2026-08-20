@@ -11,7 +11,9 @@ export const createOrder = async (req,res,next)=>{
         
     req.body.user = req.user._id; 
     req.body.paidAt= Date.now();
-    req.body.totalPrice = itemsPrice + taxPrice + shippingPrice;
+  req.body.totalPrice = Number(
+  (itemsPrice + taxPrice + shippingPrice).toFixed(2)
+);
 
     const order= await Order.create(req.body);
 
