@@ -1,244 +1,122 @@
 import { useEffect, useMemo, useState } from "react";
-
 import {
   Users,
   Search,
+  Eye,
   Edit,
   Trash2,
-  Eye,
-  X,
   ShieldCheck,
   User,
   UserCheck,
-  UserX,
   UserCog,
   Mail,
   CalendarDays,
   MoreVertical,
 } from "lucide-react";
-
 import toast from "react-hot-toast";
 import Footer from "../components/footer";
 import Nav from "../components/nav";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  AllUsers,
+  UpdateUser,
+  DeleteUser,
+} from "../reduxslice/userslice";
 
 function ManageUsers() {
-  // =====================================================
-  // STATES
-  // =====================================================
+  const { users = [], loading } = useSelector(
+    (state) => state.user
+  );
 
-  const [users, setUsers] = useState([]);
-
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const [search, setSearch] = useState("");
-
   const [roleFilter, setRoleFilter] = useState("all");
 
-  const [showViewModal, setShowViewModal] =
-    useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  const [showEditModal, setShowEditModal] =
-    useState(false);
-
-  const [selectedUser, setSelectedUser] =
-    useState(null);
-
-  const [selectedRole, setSelectedRole] =
-    useState("");
-
-  const [updateLoading, setUpdateLoading] =
-    useState(false);
-
-  // =====================================================
-  // GET ALL USERS
-  // =====================================================
-
-  const getAllUsers = async () => {
-    try {
-      setLoading(true);
-
-      const response = await fetch(
-        "http://localhost:5000/api/users",
-        {
-          credentials: "include",
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to fetch users"
-        );
-      }
-
-      setUsers(data.users || []);
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // =====================================================
-  // LOAD USERS
-  // =====================================================
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedRole, setSelectedRole] = useState("");
 
   useEffect(() => {
-    getAllUsers();
-  }, []);
-
-  // =====================================================
-  // STATISTICS
-  // =====================================================
+    dispatch(AllUsers());
+  }, [dispatch]);
 
   const totalUsers = users.length;
 
-  const totalAdmins = users.filter(
+  const totalAdmins = users?.filter(
     (user) => user.role === "admin"
   ).length;
 
-  const totalNormalUsers = users.filter(
+  const totalNormalUsers = users?.filter(
     (user) => user.role === "user"
   ).length;
 
-  // Users without admin role
-  const activeUsers = users.filter(
-    (user) => user.role !== "admin"
-  ).length;
-
-  // =====================================================
-  // FILTER USERS
-  // =====================================================
-
   const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const searchValue =
-        search.toLowerCase().trim();
+    return users?.filter((user) => {
+      const searchValue = search.toLowerCase().trim();
 
       const matchesSearch =
-        user.name
-          ?.toLowerCase()
-          .includes(searchValue) ||
-        user.email
-          ?.toLowerCase()
-          .includes(searchValue);
+        user.name?.toLowerCase().includes(searchValue) ||
+        user.email?.toLowerCase().includes(searchValue);
 
       const matchesRole =
         roleFilter === "all" ||
-        user.role === roleFilter;
+        user?.role === roleFilter;
 
       return matchesSearch && matchesRole;
     });
   }, [users, search, roleFilter]);
 
-  // =====================================================
-  // VIEW USER
-  // =====================================================
-
   const viewUser = (user) => {
     setSelectedUser(user);
-
     setShowViewModal(true);
   };
 
-  // =====================================================
-  // OPEN EDIT MODAL
-  // =====================================================
+  const closeViewModal = () => {
+    setShowViewModal(false);
+    setSelectedUser(null);
+  };
 
   const openEditModal = (user) => {
     setSelectedUser(user);
-
     setSelectedRole(user.role);
-
     setShowEditModal(true);
   };
 
-  // =====================================================
-  // CLOSE MODALS
-  // =====================================================
-
-  const closeModals = () => {
-    if (updateLoading) return;
-
-    setShowViewModal(false);
-
+  const closeEditModal = () => {
     setShowEditModal(false);
-
     setSelectedUser(null);
-
     setSelectedRole("");
   };
 
-  // =====================================================
-  // UPDATE USER ROLE
-  // =====================================================
-
-  const updateUserRole = async () => {
+  const updateUser = async () => {
     if (!selectedUser) return;
 
-    if (!selectedRole) {
-      toast.error("Please select a role");
-
-      return;
-    }
-
     try {
-      setUpdateLoading(true);
-
-      const response = await fetch(
-        `http://localhost:5000/api/users/${selectedUser._id}`,
-        {
-          method: "PUT",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          credentials: "include",
-
-          body: JSON.stringify({
+      await dispatch(
+        UpdateUser({
+          id: selectedUser._id,
+          value: {
             role: selectedRole,
-          }),
-        }
-      );
+          },
+        })
+      ).unwrap();
 
-      const data = await response.json();
+      toast.success("User role updated successfully");
 
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to update user"
-        );
-      }
+      closeEditModal();
 
-      toast.success(
-        "User updated successfully"
-      );
-
-      // Update UI immediately
-
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user._id === selectedUser._id
-            ? {
-                ...user,
-                role: selectedRole,
-              }
-            : user
-        )
-      );
-
-      closeModals();
+      dispatch(AllUsers());
     } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setUpdateLoading(false);
+      toast.error(
+        error?.message ||
+          error?.error ||
+          "Failed to update user"
+      );
     }
   };
-
-  // =====================================================
-  // DELETE USER
-  // =====================================================
 
   const deleteUser = async (id) => {
     const confirmDelete = window.confirm(
@@ -248,43 +126,19 @@ function ManageUsers() {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/users/${id}`,
-        {
-          method: "DELETE",
+      await dispatch(DeleteUser(id)).unwrap();
 
-          credentials: "include",
-        }
-      );
+      toast.success("User deleted successfully");
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-            "Failed to delete user"
-        );
-      }
-
-      toast.success(
-        "User deleted successfully"
-      );
-
-      // Immediately remove from UI
-
-      setUsers((prevUsers) =>
-        prevUsers.filter(
-          (user) => user._id !== id
-        )
-      );
+      dispatch(AllUsers());
     } catch (error) {
-      toast.error(error.message);
+      toast.error(
+        error?.message ||
+          error?.error ||
+          "Failed to delete user"
+      );
     }
   };
-
-  // =====================================================
-  // FORMAT DATE
-  // =====================================================
 
   const formatDate = (date) => {
     if (!date) return "Unknown";
@@ -299,14 +153,7 @@ function ManageUsers() {
     );
   };
 
-  // =====================================================
-  // USER AVATAR
-  // =====================================================
-
-  const UserAvatar = ({
-    user,
-    size = 60,
-  }) => {
+  const UserAvatar = ({ user, size = 60 }) => {
     if (user?.avatar?.url) {
       return (
         <img
@@ -330,1028 +177,741 @@ function ManageUsers() {
           height: `${size}px`,
           backgroundColor: "#E8F1EE",
           color: "#5C8374",
-          fontSize:
-            size >= 60 ? "22px" : "17px",
+          fontSize: size >= 60 ? "22px" : "17px",
         }}
       >
         {user?.name
-          ? user.name
-              .charAt(0)
-              .toUpperCase()
+          ? user.name.charAt(0).toUpperCase()
           : "U"}
       </div>
     );
   };
 
-  // =====================================================
-  // RENDER
-  // =====================================================
-
   return (
     <div>
+      <Nav />
 
-        <Nav/>
+      <div className="container mt-5">
+        {/* HEADER */}
 
-        <div className="container mt-5">
+        <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+          <div>
+            <h2 className="fw-bold mb-1">
+              Users
+            </h2>
 
-      {/* =================================================
-          HEADER
-      ================================================= */}
-
-      <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-
-        <div>
-
-          <h2 className="fw-bold mb-1">
-            Users
-          </h2>
-
-          <p className="text-muted mb-0">
-            Manage customers and administrator accounts
-          </p>
-
-        </div>
-
-        <div className="bg-white border rounded px-3 py-2 d-flex align-items-center gap-2">
-
-          <Users
-            size={18}
-            style={{
-              color: "#5C8374",
-            }}
-          />
-
-          <strong>
-            {totalUsers}
-          </strong>
-
-          <span className="text-muted">
-            Total Users
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* =================================================
-          STATISTICS
-      ================================================= */}
-
-      <div className="row g-3 mb-4">
-
-        {/* TOTAL USERS */}
-
-        <div className="col-12 col-sm-6 col-xl-3">
-
-          <div className="card border-0 shadow-sm h-100">
-
-            <div className="card-body">
-
-              <div className="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                  <p className="text-muted small mb-1">
-                    Total Users
-                  </p>
-
-                  <h3 className="fw-bold mb-0">
-                    {totalUsers}
-                  </h3>
-
-                </div>
-
-                <div
-                  className="rounded-circle p-3"
-                  style={{
-                    backgroundColor:
-                      "#E8F1EE",
-                    color: "#5C8374",
-                  }}
-                >
-                  <Users size={23} />
-                </div>
-
-              </div>
-
-            </div>
-
+            <p className="text-muted mb-0">
+              Manage customers and administrator accounts
+            </p>
           </div>
 
-        </div>
+          <div className="bg-white border rounded px-3 py-2 d-flex align-items-center gap-2">
+            <Users
+              size={18}
+              style={{
+                color: "#5C8374",
+              }}
+            />
 
-        {/* NORMAL USERS */}
+            <strong>{totalUsers}</strong>
 
-        <div className="col-12 col-sm-6 col-xl-3">
-
-          <div className="card border-0 shadow-sm h-100">
-
-            <div className="card-body">
-
-              <div className="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                  <p className="text-muted small mb-1">
-                    Customers
-                  </p>
-
-                  <h3 className="fw-bold mb-0">
-                    {totalNormalUsers}
-                  </h3>
-
-                </div>
-
-                <div
-                  className="rounded-circle p-3"
-                  style={{
-                    backgroundColor:
-                      "#E8F1EE",
-                    color: "#5C8374",
-                  }}
-                >
-                  <UserCheck size={23} />
-                </div>
-
-              </div>
-
-            </div>
-
+            <span className="text-muted">
+              Total Users
+            </span>
           </div>
-
         </div>
 
-        {/* ADMINS */}
-
-        <div className="col-12 col-sm-6 col-xl-3">
-
-          <div className="card border-0 shadow-sm h-100">
-
-            <div className="card-body">
-
-              <div className="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                  <p className="text-muted small mb-1">
-                    Administrators
-                  </p>
-
-                  <h3 className="fw-bold mb-0">
-                    {totalAdmins}
-                  </h3>
-
-                </div>
-
-                <div
-                  className="rounded-circle p-3"
-                  style={{
-                    backgroundColor:
-                      "#FFF4D6",
-                    color: "#D97706",
-                  }}
-                >
-                  <ShieldCheck size={23} />
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* ACTIVE */}
-
-        <div className="col-12 col-sm-6 col-xl-3">
-
-          <div className="card border-0 shadow-sm h-100">
-
-            <div className="card-body">
-
-              <div className="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                  <p className="text-muted small mb-1">
-                    Regular Accounts
-                  </p>
-
-                  <h3 className="fw-bold mb-0">
-                    {activeUsers}
-                  </h3>
-
-                </div>
-
-                <div
-                  className="rounded-circle p-3"
-                  style={{
-                    backgroundColor:
-                      "#E8F1EE",
-                    color: "#5C8374",
-                  }}
-                >
-                  <UserCog size={23} />
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* =================================================
-          SEARCH + FILTER
-      ================================================= */}
-
-      <div className="card border-0 shadow-sm mb-4">
-
-        <div className="card-body">
-
-          <div className="row g-3">
-
-            {/* SEARCH */}
-
-            <div className="col-12 col-lg-8">
-
-              <div className="input-group">
-
-                <span className="input-group-text bg-white">
-
-                  <Search
-                    size={18}
-                    className="text-muted"
-                  />
-
-                </span>
-
-                <input
-                  type="search"
-                  className="form-control"
-                  placeholder="Search users by name or email..."
-                  value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
-                />
-
-              </div>
-
-            </div>
-
-            {/* ROLE */}
-
-            <div className="col-12 col-lg-4">
-
-              <select
-                className="form-select"
-                value={roleFilter}
-                onChange={(e) =>
-                  setRoleFilter(
-                    e.target.value
-                  )
-                }
-              >
-
-                <option value="all">
-                  All Users
-                </option>
-
-                <option value="user">
-                  Customers
-                </option>
-
-                <option value="admin">
-                  Administrators
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* =================================================
-          RESULTS
-      ================================================= */}
-
-      <div className="d-flex justify-content-between align-items-center mb-3">
-
-        <div>
-
-          <span className="text-muted">
-            Showing{" "}
-          </span>
-
-          <strong>
-            {filteredUsers.length}
-          </strong>
-
-          <span className="text-muted">
-            {" "}users
-          </span>
-
-        </div>
-
-        {search || roleFilter !== "all" ? (
-
-          <button
-            className="btn btn-sm btn-outline-secondary"
-            onClick={() => {
-              setSearch("");
-              setRoleFilter("all");
-            }}
-          >
-            Clear Filters
-          </button>
-
-        ) : null}
-
-      </div>
-
-      {/* =================================================
-          LOADING
-      ================================================= */}
-
-      {loading && (
-
-        <div className="text-center py-5">
-
-          <div
-            className="spinner-border"
-            style={{
-              color: "#5C8374",
-            }}
-          ></div>
-
-          <p className="text-muted mt-2">
-            Loading users...
-          </p>
-
-        </div>
-
-      )}
-
-      {/* =================================================
-          USER GRID
-      ================================================= */}
-
-      {!loading && (
-
-        <div className="row g-4">
-
-          {filteredUsers.length === 0 ? (
-
-            <div className="col-12">
-
-              <div className="card border-0 shadow-sm">
-
-                <div className="card-body text-center py-5">
-
-                  <Users
-                    size={55}
-                    className="text-muted mb-3"
-                  />
-
-                  <h5 className="fw-bold">
-                    No Users Found
-                  </h5>
-
-                  <p className="text-muted mb-0">
-                    Try changing your search or filter.
-                  </p>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ) : (
-
-            filteredUsers.map((user) => (
-
-              <div
-                className="col-12 col-md-6 col-xl-4"
-                key={user._id}
-              >
-
-                <div className="card border-0 shadow-sm h-100">
-
-                  {/* =================================================
-                      CARD HEADER
-                  ================================================= */}
-
-                  <div className="card-body">
-
-                    <div className="d-flex justify-content-between align-items-start">
-
-                      <UserAvatar
-                        user={user}
-                        size={65}
-                      />
-
-                      {/* DROPDOWN */}
-
-                      <div className="dropdown">
-
-                        <button
-                          className="btn btn-light rounded-circle"
-                          data-bs-toggle="dropdown"
-                        >
-                          <MoreVertical
-                            size={18}
-                          />
-                        </button>
-
-                        <ul className="dropdown-menu dropdown-menu-end">
-
-                          <li>
-
-                            <button
-                              className="dropdown-item d-flex align-items-center gap-2"
-                              onClick={() =>
-                                viewUser(user)
-                              }
-                            >
-
-                              <Eye size={16} />
-
-                              View Details
-
-                            </button>
-
-                          </li>
-
-                          <li>
-
-                            <button
-                              className="dropdown-item d-flex align-items-center gap-2"
-                              onClick={() =>
-                                openEditModal(user)
-                              }
-                            >
-
-                              <Edit size={16} />
-
-                              Change Role
-
-                            </button>
-
-                          </li>
-
-                          <li>
-                            <hr className="dropdown-divider" />
-                          </li>
-
-                          <li>
-
-                            <button
-                              className="dropdown-item text-danger d-flex align-items-center gap-2"
-                              onClick={() =>
-                                deleteUser(
-                                  user._id
-                                )
-                              }
-                            >
-
-                              <Trash2 size={16} />
-
-                              Delete User
-
-                            </button>
-
-                          </li>
-
-                        </ul>
-
-                      </div>
-
-                    </div>
-
-                    {/* =================================================
-                        USER INFO
-                    ================================================= */}
-
-                    <div className="mt-3">
-
-                      <h5 className="fw-bold mb-1">
-                        {user.name}
-                      </h5>
-
-                      <div className="text-muted small d-flex align-items-center gap-2">
-
-                        <Mail size={14} />
-
-                        <span className="text-break">
-                          {user.email}
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                    {/* =================================================
-                        ROLE
-                    ================================================= */}
-
-                    <div className="mt-3">
-
-                      {user.role === "admin" ? (
-
-                        <span className="badge bg-danger d-inline-flex align-items-center gap-1">
-
-                          <ShieldCheck
-                            size={13}
-                          />
-
-                          Administrator
-
-                        </span>
-
-                      ) : (
-
-                        <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
-
-                          <User size={13} />
-
-                          Customer
-
-                        </span>
-
-                      )}
-
-                    </div>
-
-                    {/* =================================================
-                        DETAILS
-                    ================================================= */}
-
-                    <div className="border-top mt-4 pt-3">
-
-                      <div className="d-flex justify-content-between">
-
-                        <div>
-
-                          <small className="text-muted d-block">
-                            Joined
-                          </small>
-
-                          <span className="small fw-semibold d-flex align-items-center gap-1">
-
-                            <CalendarDays
-                              size={14}
-                            />
-
-                            {formatDate(
-                              user.createdAt
-                            )}
-
-                          </span>
-
-                        </div>
-
-                        <div className="text-end">
-
-                          <small className="text-muted d-block">
-                            Account
-                          </small>
-
-                          <span className="small fw-semibold text-success">
-                            Active
-                          </span>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  {/* =================================================
-                      ACTIONS
-                  ================================================= */}
-
-                  <div className="card-footer bg-white border-0 pt-0 pb-3">
-
-                    <div className="d-flex gap-2">
-
-                      <button
-                        className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2"
-                        onClick={() =>
-                          viewUser(user)
-                        }
-                      >
-
-                        <Eye size={16} />
-
-                        View
-
-                      </button>
-
-                      <button
-                        className="btn btn-outline-primary d-flex align-items-center justify-content-center"
-                        style={{
-                          width: "48px",
-                        }}
-                        onClick={() =>
-                          openEditModal(user)
-                        }
-                        title="Change Role"
-                      >
-
-                        <Edit size={16} />
-
-                      </button>
-
-                      <button
-                        className="btn btn-outline-danger d-flex align-items-center justify-content-center"
-                        style={{
-                          width: "48px",
-                        }}
-                        onClick={() =>
-                          deleteUser(user._id)
-                        }
-                        title="Delete User"
-                      >
-
-                        <Trash2 size={16} />
-
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            ))
-
-          )}
-
-        </div>
-
-      )}
-
-      {/* =====================================================
-          VIEW USER MODAL
-      ===================================================== */}
-
-      {showViewModal && selectedUser && (
-
-        <div
-          className="modal d-block"
-          tabIndex="-1"
-          style={{
-            backgroundColor:
-              "rgba(0,0,0,0.55)",
-          }}
-        >
-
-          <div className="modal-dialog modal-dialog-centered">
-
-            <div className="modal-content border-0 shadow">
-
-              {/* HEADER */}
-
-              <div className="modal-header">
-
-                <h5 className="modal-title fw-bold">
-                  User Profile
-                </h5>
-
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={closeModals}
-                ></button>
-
-              </div>
-
-              {/* BODY */}
-
-              <div className="modal-body">
-
-                <div className="text-center">
-
-                  <UserAvatar
-                    user={selectedUser}
-                    size={100}
-                  />
-
-                  <h4 className="fw-bold mt-3 mb-1">
-                    {selectedUser.name}
-                  </h4>
-
-                  <p className="text-muted">
-                    {selectedUser.email}
-                  </p>
-
-                  {selectedUser.role ===
-                  "admin" ? (
-
-                    <span className="badge bg-danger">
-
-                      <ShieldCheck
-                        size={13}
-                        className="me-1"
-                      />
-
-                      Administrator
-
-                    </span>
-
-                  ) : (
-
-                    <span className="badge bg-secondary">
-
-                      <User
-                        size={13}
-                        className="me-1"
-                      />
-
-                      Customer
-
-                    </span>
-
-                  )}
-
-                </div>
-
-                {/* DETAILS */}
-
-                <div className="mt-4">
-
-                  <div className="border-bottom py-3">
-
-                    <small className="text-muted">
-                      User ID
-                    </small>
-
-                    <div className="fw-semibold text-break">
-                      {selectedUser._id}
-                    </div>
-
-                  </div>
-
-                  <div className="border-bottom py-3">
-
-                    <small className="text-muted">
-                      Email Address
-                    </small>
-
-                    <div className="fw-semibold text-break">
-                      {selectedUser.email}
-                    </div>
-
-                  </div>
-
-                  <div className="border-bottom py-3">
-
-                    <small className="text-muted">
-                      Account Role
-                    </small>
-
-                    <div className="fw-semibold">
-                      {selectedUser.role ===
-                      "admin"
-                        ? "Administrator"
-                        : "Customer"}
-                    </div>
-
-                  </div>
-
-                  <div className="py-3">
-
-                    <small className="text-muted">
-                      Joined Date
-                    </small>
-
-                    <div className="fw-semibold">
-                      {formatDate(
-                        selectedUser.createdAt
-                      )}
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              {/* FOOTER */}
-
-              <div className="modal-footer">
-
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={closeModals}
-                >
-                  Close
-                </button>
-
-                <button
-                  className="btn text-white"
-                  style={{
-                    backgroundColor:
-                      "#5C8374",
-                  }}
-                  onClick={() => {
-                    setShowViewModal(false);
-
-                    openEditModal(
-                      selectedUser
-                    );
-                  }}
-                >
-                  <Edit size={16} />
-                  {" "}Change Role
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* =====================================================
-          EDIT ROLE MODAL
-      ===================================================== */}
-
-      {showEditModal && selectedUser && (
-
-        <div
-          className="modal d-block"
-          tabIndex="-1"
-          style={{
-            backgroundColor:
-              "rgba(0,0,0,0.55)",
-          }}
-        >
-
-          <div className="modal-dialog modal-dialog-centered">
-
-            <div className="modal-content border-0 shadow">
-
-              {/* HEADER */}
-
-              <div className="modal-header">
-
-                <div>
-
-                  <h5 className="modal-title fw-bold">
-                    Change User Role
-                  </h5>
-
-                  <small className="text-muted">
-                    Update account permissions
-                  </small>
-
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={closeModals}
-                ></button>
-
-              </div>
-
-              {/* BODY */}
-
-              <div className="modal-body">
-
-                <div className="d-flex align-items-center gap-3 mb-4">
-
-                  <UserAvatar
-                    user={selectedUser}
-                    size={55}
-                  />
-
+        {/* STATISTICS */}
+
+        <div className="row g-3 mb-4">
+          {/* TOTAL USERS */}
+
+          <div className="col-12 col-sm-6 col-xl-3">
+            <div className="card border-0 shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
                   <div>
+                    <p className="text-muted small mb-1">
+                      Total Users
+                    </p>
 
-                    <h6 className="fw-bold mb-1">
-                      {selectedUser.name}
-                    </h6>
-
-                    <small className="text-muted">
-                      {selectedUser.email}
-                    </small>
-
+                    <h3 className="fw-bold mb-0">
+                      {totalUsers}
+                    </h3>
                   </div>
 
+                  <div
+                    className="rounded-circle p-3"
+                    style={{
+                      backgroundColor: "#E8F1EE",
+                      color: "#5C8374",
+                    }}
+                  >
+                    <Users size={23} />
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <label className="form-label fw-semibold">
-                  Select Role
-                </label>
+          {/* CUSTOMERS */}
 
+          <div className="col-12 col-sm-6 col-xl-3">
+            <div className="card border-0 shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p className="text-muted small mb-1">
+                      Customers
+                    </p>
+
+                    <h3 className="fw-bold mb-0">
+                      {totalNormalUsers}
+                    </h3>
+                  </div>
+
+                  <div
+                    className="rounded-circle p-3"
+                    style={{
+                      backgroundColor: "#E8F1EE",
+                      color: "#5C8374",
+                    }}
+                  >
+                    <UserCheck size={23} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ADMINISTRATORS */}
+
+          <div className="col-12 col-sm-6 col-xl-3">
+            <div className="card border-0 shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p className="text-muted small mb-1">
+                      Administrators
+                    </p>
+
+                    <h3 className="fw-bold mb-0">
+                      {totalAdmins}
+                    </h3>
+                  </div>
+
+                  <div
+                    className="rounded-circle p-3"
+                    style={{
+                      backgroundColor: "#FFF4D6",
+                      color: "#D97706",
+                    }}
+                  >
+                    <ShieldCheck size={23} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* DISPLAYED USERS */}
+
+          <div className="col-12 col-sm-6 col-xl-3">
+            <div className="card border-0 shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p className="text-muted small mb-1">
+                      Displayed Users
+                    </p>
+
+                    <h3 className="fw-bold mb-0">
+                      {filteredUsers.length}
+                    </h3>
+                  </div>
+
+                  <div
+                    className="rounded-circle p-3"
+                    style={{
+                      backgroundColor: "#E8F1EE",
+                      color: "#5C8374",
+                    }}
+                  >
+                    <UserCog size={23} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SEARCH AND FILTER */}
+
+        <div className="card border-0 shadow-sm mb-4">
+          <div className="card-body">
+            <div className="row g-3">
+              <div className="col-12 col-lg-8">
+                <div className="input-group">
+                  <span className="input-group-text bg-white">
+                    <Search
+                      size={18}
+                      className="text-muted"
+                    />
+                  </span>
+
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search users by name or email..."
+                    value={search}
+                    onChange={(e) =>
+                      setSearch(e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="col-12 col-lg-4">
                 <select
                   className="form-select"
-                  value={selectedRole}
+                  value={roleFilter}
                   onChange={(e) =>
-                    setSelectedRole(
-                      e.target.value
-                    )
+                    setRoleFilter(e.target.value)
                   }
                 >
+                  <option value="all">
+                    All Users
+                  </option>
 
                   <option value="user">
-                    Customer
+                    Customers
                   </option>
 
                   <option value="admin">
-                    Administrator
+                    Administrators
                   </option>
-
                 </select>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="alert alert-warning mt-3 mb-0 small">
+        {/* RESULTS */}
 
-                  <ShieldCheck
-                    size={16}
-                    className="me-2"
-                  />
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <span className="text-muted">
+              Showing{" "}
+            </span>
 
-                  Administrators may have access
-                  to store management features.
+            <strong>
+              {filteredUsers.length}
+            </strong>
+
+            <span className="text-muted">
+              {" "}users
+            </span>
+          </div>
+
+          {(search || roleFilter !== "all") && (
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => {
+                setSearch("");
+                setRoleFilter("all");
+              }}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+
+        {/* LOADING */}
+
+        {loading && (
+          <div className="text-center py-5">
+            <div
+              className="spinner-border"
+              style={{
+                color: "#5C8374",
+              }}
+            ></div>
+
+            <p className="text-muted mt-2">
+              Loading users...
+            </p>
+          </div>
+        )}
+
+        {/* USERS */}
+
+        {!loading && (
+          <div className="row g-4">
+            {filteredUsers.length === 0 ? (
+              <div className="col-12">
+                <div className="card border-0 shadow-sm">
+                  <div className="card-body text-center py-5">
+                    <Users
+                      size={55}
+                      className="text-muted mb-3"
+                    />
+
+                    <h5 className="fw-bold">
+                      No Users Found
+                    </h5>
+
+                    <p className="text-muted mb-0">
+                      Try changing your search or filter.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              filteredUsers.map((user) => (
+                <div
+                  className="col-12 col-md-6 col-xl-4"
+                  key={user._id}
+                >
+                  <div className="card border-0 shadow-sm h-100">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-start">
+                        <UserAvatar
+                          user={user}
+                          size={65}
+                        />
+
+                        {/* DROPDOWN */}
+
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-light rounded-circle"
+                            data-bs-toggle="dropdown"
+                          >
+                            <MoreVertical size={18} />
+                          </button>
+
+                          <ul className="dropdown-menu dropdown-menu-end">
+                            <li>
+                              <button
+                                className="dropdown-item d-flex align-items-center gap-2"
+                                onClick={() =>
+                                  viewUser(user)
+                                }
+                              >
+                                <Eye size={16} />
+                                View Details
+                              </button>
+                            </li>
+
+                            <li>
+                              <button
+                                className="dropdown-item d-flex align-items-center gap-2"
+                                onClick={() =>
+                                  openEditModal(user)
+                                }
+                              >
+                                <Edit size={16} />
+                                Edit Role
+                              </button>
+                            </li>
+
+                            <li>
+                              <hr className="dropdown-divider" />
+                            </li>
+
+                            <li>
+                              <button
+                                className="dropdown-item text-danger d-flex align-items-center gap-2"
+                                onClick={() =>
+                                  deleteUser(user._id)
+                                }
+                              >
+                                <Trash2 size={16} />
+                                Delete User
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* USER INFO */}
+
+                      <div className="mt-3">
+                        <h5 className="fw-bold mb-1">
+                          {user.name}
+                        </h5>
+
+                        <div className="text-muted small d-flex align-items-center gap-2">
+                          <Mail size={14} />
+
+                          <span className="text-break">
+                            {user.email}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* ROLE */}
+
+                      <div className="mt-3">
+                        {user.role === "admin" ? (
+                          <span className="badge bg-danger d-inline-flex align-items-center gap-1">
+                            <ShieldCheck size={13} />
+                            Administrator
+                          </span>
+                        ) : (
+                          <span className="badge bg-secondary d-inline-flex align-items-center gap-1">
+                            <User size={13} />
+                            Customer
+                          </span>
+                        )}
+                      </div>
+
+                      {/* JOINED DATE */}
+
+                      <div className="border-top mt-4 pt-3">
+                        <small className="text-muted d-block">
+                          Joined
+                        </small>
+
+                        <span className="small fw-semibold d-flex align-items-center gap-1">
+                          <CalendarDays size={14} />
+
+                          {formatDate(user.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* ACTION BUTTONS */}
+
+                    <div className="card-footer bg-white border-0 pt-0 pb-3">
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn btn-outline-secondary flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                          onClick={() =>
+                            viewUser(user)
+                          }
+                        >
+                          <Eye size={16} />
+                          View
+                        </button>
+
+                        <button
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "45px",
+                          }}
+                          onClick={() =>
+                            openEditModal(user)
+                          }
+                          title="Edit Role"
+                        >
+                          <Edit size={16} />
+                        </button>
+
+                        <button
+                          className="btn btn-outline-danger d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "45px",
+                          }}
+                          onClick={() =>
+                            deleteUser(user._id)
+                          }
+                          title="Delete User"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* VIEW USER MODAL */}
+
+        {showViewModal && selectedUser && (
+          <div
+            className="modal d-block"
+            tabIndex="-1"
+            style={{
+              backgroundColor:
+                "rgba(0,0,0,0.55)",
+            }}
+          >
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content border-0 shadow">
+                <div className="modal-header">
+                  <h5 className="modal-title fw-bold">
+                    User Profile
+                  </h5>
+
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={closeViewModal}
+                  ></button>
+                </div>
+
+                <div className="modal-body">
+                  {/* PROFILE */}
+
+                  <div className="text-center">
+                    <UserAvatar
+                      user={selectedUser}
+                      size={90}
+                    />
+
+                    <h4 className="fw-bold mt-2 mb-0">
+                      {selectedUser.name}
+                    </h4>
+
+                    <p className="text-muted mb-2">
+                      {selectedUser.email}
+                    </p>
+
+                    {selectedUser.role === "admin" ? (
+                      <span className="badge bg-danger">
+                        Administrator
+                      </span>
+                    ) : (
+                      <span className="badge bg-secondary">
+                        Customer
+                      </span>
+                    )}
+                  </div>
+
+                  {/* DETAILS */}
+
+                  <div className="mt-3 border rounded overflow-hidden">
+                    <div className="row g-0">
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        User ID
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold text-break small border-bottom">
+                        {selectedUser._id}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        Email
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold text-break border-bottom">
+                        {selectedUser.email}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        Phone
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold border-bottom">
+                        {selectedUser.phoneNo ||
+                          "Not provided"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        Address
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold text-break border-bottom">
+                        {selectedUser.address ||
+                          "Not provided"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        City
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold border-bottom">
+                        {selectedUser.city ||
+                          "Not provided"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        State
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold border-bottom">
+                        {selectedUser.state ||
+                          "Not provided"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        Country
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold border-bottom">
+                        {selectedUser.country ||
+                          "Not provided"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        Pin Code
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold border-bottom">
+                        {selectedUser.pinCode ||
+                          "Not provided"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small border-bottom">
+                        Role
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold border-bottom">
+                        {selectedUser.role === "admin"
+                          ? "Administrator"
+                          : "Customer"}
+                      </div>
+
+                      <div className="col-4 py-2 px-3 bg-light text-muted small">
+                        Joined
+                      </div>
+
+                      <div className="col-8 py-2 px-3 fw-semibold">
+                        {formatDate(
+                          selectedUser.createdAt
+                        )}
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={closeViewModal}
+                  >
+                    Close
+                  </button>
+
+                  <button
+                    className="btn text-white"
+                    style={{
+                      backgroundColor:
+                        "#5C8374",
+                    }}
+                    onClick={() => {
+                      setShowViewModal(false);
+                      openEditModal(selectedUser);
+                    }}
+                  >
+                    <Edit
+                      size={16}
+                      className="me-1"
+                    />
+                    Edit Role
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* EDIT USER MODAL */}
+
+        {showEditModal && selectedUser && (
+          <div
+            className="modal d-block"
+            tabIndex="-1"
+            style={{
+              backgroundColor:
+                "rgba(0,0,0,0.55)",
+            }}
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content border-0 shadow">
+
+                <div className="modal-header">
+                  <h5 className="modal-title fw-bold">
+                    Update User Role
+                  </h5>
+
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={closeEditModal}
+                  ></button>
+                </div>
+
+                <div className="modal-body">
+
+                  <div className="d-flex align-items-center gap-3 mb-3">
+                    <UserAvatar
+                      user={selectedUser}
+                      size={55}
+                    />
+
+                    <div>
+                      <h6 className="fw-bold mb-1">
+                        {selectedUser.name}
+                      </h6>
+
+                      <p className="text-muted small mb-0">
+                        {selectedUser.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="form-label fw-semibold">
+                    User Role
+                  </label>
+
+                  <select
+                    className="form-select"
+                    value={selectedRole}
+                    onChange={(e) =>
+                      setSelectedRole(
+                        e.target.value
+                      )
+                    }
+                  >
+                    <option value="user">
+                      Customer
+                    </option>
+
+                    <option value="admin">
+                      Administrator
+                    </option>
+                  </select>
 
                 </div>
 
-              </div>
+                <div className="modal-footer">
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={closeEditModal}
+                  >
+                    Cancel
+                  </button>
 
-              {/* FOOTER */}
-
-              <div className="modal-footer">
-
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={closeModals}
-                  disabled={updateLoading}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  className="btn text-white"
-                  style={{
-                    backgroundColor:
-                      "#5C8374",
-                  }}
-                  onClick={updateUserRole}
-                  disabled={updateLoading}
-                >
-
-                  {updateLoading ? (
-
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2"></span>
-                      Updating...
-                    </>
-
-                  ) : (
-
-                    <>
-                      <ShieldCheck
-                        size={16}
-                        className="me-1"
-                      />
-                      Update Role
-                    </>
-
-                  )}
-
-                </button>
+                  <button
+                    className="btn text-white"
+                    style={{
+                      backgroundColor:
+                        "#5C8374",
+                    }}
+                    onClick={updateUser}
+                  >
+                    <Edit
+                      size={16}
+                      className="me-1"
+                    />
+                    Update User
+                  </button>
+                </div>
 
               </div>
-
             </div>
-
           </div>
-
-        </div>
-
-      )}
+        )}
       </div>
 
-      <Footer/>
-
+      <Footer />
     </div>
   );
 }
